@@ -1,0 +1,53 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.bg {
+	background: linear-gradient(to right, #ff0000bf, #6200ffed);
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+}
+
+.contain {
+  position: relative;
+  width: 400px;
+  margin: 0px auto;
+  padding: 20px 20px 100px 20px;
+  
+  height: 100%
+}
+
+input[type=button] {
+  width: 90px;
+  height: 90px;
+  font-size: 25px;
+  margin: 4px;
+  cursor: pointer;
+  text-align: center;
+}
+
+input[type = text] {
+  position: relative;
+  display: block;
+  width: 380px;
+  margin-bottom: 16px;
+  text-align: right;
+  font-size: 25px;
+  padding: 10px;
+  font-weight: bold;
+}
+
+#btn-equals {
+	height: 192px;
+}
+
+#btn-zero {
+	width: 192px;
+}

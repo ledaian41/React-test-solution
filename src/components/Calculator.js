@@ -81,7 +81,7 @@ export default class Calculator extends Component {
 		if (this.state.isComputed && !isNaN(value)) {
 			result = value
 		} else {
-			result = this.helper.checkNumStartWithZero(this.state.result, value)
+			result = this.helper.checkNumStartWithZero(this.state.result, value, this.state.dotAvailable)
 		}
 		this.setState({result: result, isComputed: false})
 	}
@@ -119,7 +119,13 @@ export default class Calculator extends Component {
 		if (!this.state.isComputed) {
 			const length = this.state.result.length
 			const result = this.state.result.slice(0, length - 1)
-			const dotAvailable = this.state.result[length - 1] === '.'
+			let dotAvailable = this.state.dotAvailable
+			const before = this.state.result[length - 1]
+			if (before === '.') {
+				dotAvailable = true
+			} else if (before !== '.' && isNaN(before)) {
+				dotAvailable = false
+			}
 			this.setState({result: result, dotAvailable: dotAvailable})
 		}
 	}
@@ -130,8 +136,18 @@ export default class Calculator extends Component {
 }
 
 class CalculateHelper {
-	checkNumStartWithZero(exp, insertValue) {
-		return (exp[exp.length - 1] === '0') ? (exp.slice(0, exp.length-1) + insertValue) : (exp + insertValue)
+	checkNumStartWithZero(exp, insertValue, dotAvailable) {
+		let lastOperator = -1
+		for (let i = exp.length; i > 0; i--) {
+			if (isNaN(exp[i-1]) && exp[i - 1] != '.') {
+				lastOperator = (i - 1)
+				break
+			}
+		}
+		if (exp[lastOperator + 1] === '0' && dotAvailable) {
+			return (exp.slice(0, exp.length - 1) + insertValue)
+		}
+		return exp + insertValue
 	}
 
 	calculate(exp) {

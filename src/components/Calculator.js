@@ -132,7 +132,7 @@ export default class Calculator extends Component {
 	}
 
 	clear() {
-		this.setState({result: ''})
+		this.setState({result: '0', isComputed: false, isOperatorPending: false, dotAvailable: true})
 	}
 }
 

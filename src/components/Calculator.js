@@ -66,9 +66,10 @@ export default class Calculator extends Component {
 	insertOperator(operator) {
 		let result = ''
 		const tmp = this.state.result
+		const before = tmp.slice(tmp.length - 1)
 		if (this.state.isComputed && isNaN(tmp)) {
 			result = operator
-		} else if (isNaN(tmp.slice(tmp.length - 1))) {
+		} else if (isNaN(before) && before !== '.') {
 			result = tmp.slice(0, tmp.length - 1) + operator
 		} else {
 			result = this.state.result + operator

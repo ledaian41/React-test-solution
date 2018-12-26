@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import CalculatorButton from './CalculatorButton'
+import CalculatorHelper from '../helpers/CalculatorHelper'
 
 export default class Calculator extends Component {
 
 	constructor(props) {
 		super(props)
-		this.helper = new CalculateHelper()
+		this.helper = new CalculatorHelper()
 		this.state = {
 			result: '0',
 			isComputed: false,
-			isOperatorPending: false,
 			dotAvailable: true
 		}
 		this.insertNum = this.insertNum.bind(this)
@@ -65,14 +65,14 @@ export default class Calculator extends Component {
 
 	insertOperator(operator) {
 		let newResult = ''
-		const tmp = this.state.result
-		const before = tmp.slice(tmp.length - 1)
-		if (this.state.isComputed && isNaN(tmp)) {
+		const result = this.state.result
+		const lastChar = result.slice(result.length - 1)
+		if (this.state.isComputed && isNaN(result)) {
 			newResult = operator
-		} else if (isNaN(before) && before !== '.') {
-			newResult = tmp.slice(0, tmp.length - 1) + operator
+		} else if (this.helper.isOperator(lastChar)) {
+			newResult = result.slice(0, result.length - 1) + operator
 		} else {
-			newResult = this.state.result + operator
+			newResult = result + operator
 		}
 		this.setState({result: newResult, isComputed: false, dotAvailable: true})
 	}
@@ -89,15 +89,15 @@ export default class Calculator extends Component {
 
 	insertDot(dot) {
 		let newResult = ''
-		if (this.state.isComputed || !this.state.result) {
+		const result = this.state.result
+		if (this.state.isComputed || !result) {
 			newResult = '0.'
 			this.setState({result: newResult, isComputed: false, dotAvailable: false})
 		} else if (this.state.dotAvailable) {
-			const length = this.state.result.length
-			if (isNaN(this.state.result[length - 1])) {
+			if (isNaN(result[result.length - 1])) {
 				dot = '0' + dot
 			}
-			newResult = this.state.result + dot
+			newResult = result + dot
 			this.setState({result: newResult, isComputed: false, dotAvailable: false})
 		}
 	}
@@ -106,7 +106,7 @@ export default class Calculator extends Component {
 		let newResult = ''
 		const exp = this.state.result
 		if (exp) {
-			const checkedExp = this.helper.checkLastChar(exp)
+			const checkedExp = this.helper.convertIfLastCharIsOperator(exp)
 			try {
 				newResult = this.helper.calculate(checkedExp)
 			} catch (e) {
@@ -118,66 +118,15 @@ export default class Calculator extends Component {
 
 	back() {
 		if (!this.state.isComputed) {
-			const length = this.state.result.length
-			const newResult = this.state.result.slice(0, length - 1)
-			let dotAvailable = this.state.dotAvailable
-			const before = this.state.result[length - 1]
-			if (before === '.') {
-				dotAvailable = true
-			} else if (before !== '.' && isNaN(before)) {
-				const indexOfDot = newResult.lastIndexOf('.')
-				if (indexOfDot !== -1)  {
-					dotAvailable = false
-					for (let i = newResult.length - 1; i > indexOfDot; i--) {
-						if (isNaN(newResult[i])) {
-							dotAvailable = true
-							break;
-						}
-					}
-				}
-			}
+			const result = this.state.result
+			const newResult = result.slice(0, result.length - 1)
+			const lastChar = result[result.length - 1]
+			const dotAvailable = this.helper.checkDotAvailable(this.state.dotAvailable, lastChar, newResult)
 			this.setState({result: newResult, dotAvailable: dotAvailable})
 		}
 	}
 
 	clear() {
-		this.setState({result: '0', isComputed: false, isOperatorPending: false, dotAvailable: true})
-	}
-}
-
-class CalculateHelper {
-	checkNumStartWithZero(exp, insertValue, dotAvailable) {
-		let lastOperator = -1
-		for (let i = exp.length - 1; i > 0; i--) {
-			if (isNaN(exp[i]) && exp[i] != '.') {
-				lastOperator = i
-				break
-			}
-		}
-		if (exp[lastOperator + 1] === '0' && dotAvailable) {
-			return (exp.slice(0, exp.length - 1) + insertValue)
-		}
-		return exp + insertValue
-	}
-
-	calculate(exp) {
-		let result = eval(exp)
-		if (result === Infinity || result === -Infinity) {
-			throw new Error('Infinity')
-		}
-		result = String(result)
-		if (result === 'NaN') {
-			result = '0'
-		}
-		return result
-	}
-
-	checkLastChar(exp) {
-		const lastChar = exp.slice(exp.length - 1)
-		if (isNaN(lastChar) && lastChar !== '.') {
-			const sub = eval(exp.slice(0, exp.length - 1))
-			return sub + lastChar + sub
-		}
-		return exp
+		this.setState({result: '0', isComputed: false, dotAvailable: true})
 	}
 }

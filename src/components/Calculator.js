@@ -125,7 +125,17 @@ export default class Calculator extends Component {
 			if (before === '.') {
 				dotAvailable = true
 			} else if (before !== '.' && isNaN(before)) {
-				dotAvailable = false
+				const indexOfDot = result.lastIndexOf('.')
+				if (indexOfDot !== -1)  {
+					dotAvailable = false
+					for (let i = result.length - 1; i > indexOfDot; i--) {
+						if (isNaN(result[i])) {
+							console.log(result[i])
+							dotAvailable = true
+							break;
+						}
+					}
+				}
 			}
 			this.setState({result: result, dotAvailable: dotAvailable})
 		}
@@ -139,9 +149,9 @@ export default class Calculator extends Component {
 class CalculateHelper {
 	checkNumStartWithZero(exp, insertValue, dotAvailable) {
 		let lastOperator = -1
-		for (let i = exp.length; i > 0; i--) {
-			if (isNaN(exp[i-1]) && exp[i - 1] != '.') {
-				lastOperator = (i - 1)
+		for (let i = exp.length - 1; i > 0; i--) {
+			if (isNaN(exp[i]) && exp[i] != '.') {
+				lastOperator = i
 				break
 			}
 		}

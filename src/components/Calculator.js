@@ -112,7 +112,7 @@ export default class Calculator extends Component {
 			} catch (e) {
 				newResult = 'Error!!'
 			}
-			this.setState({result: newResult, isComputed: true})
+			this.setState({result: newResult, isComputed: true, dotAvailable: true})
 		}
 	}
 
